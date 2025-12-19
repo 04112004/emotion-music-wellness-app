@@ -1,7 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 
-function EmotionCard({onAnalyze}) {
+// ✅ API base from environment
+const API_BASE = import.meta.env.VITE_API_BASE;
+
+function EmotionCard({ onAnalyze }) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -17,7 +20,7 @@ function EmotionCard({onAnalyze}) {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/analyze", {
+      const res = await axios.post(`${API_BASE}/analyze`, {
         text,
       });
 
@@ -25,7 +28,7 @@ function EmotionCard({onAnalyze}) {
       if (onAnalyze) onAnalyze();
 
     } catch (err) {
-      setError("Failed to analyze mood. Is backend running?");
+      setError("Failed to analyze mood. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -119,3 +122,4 @@ function EmotionCard({onAnalyze}) {
 }
 
 export default EmotionCard;
+
