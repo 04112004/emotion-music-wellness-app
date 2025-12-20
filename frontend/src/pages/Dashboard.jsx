@@ -12,10 +12,10 @@ function Dashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-semibold text-slate-100">
-            Alex Nguyen
+            Hi User 👋
           </h1>
           <p className="text-sm text-slate-400">
-            Mental wellness overview
+            Here's your Mental wellness overview
           </p>
         </div>
         <span className="text-sm text-slate-500">
@@ -35,7 +35,8 @@ function Dashboard() {
             Average emotional state over the last 7 days
           </p>
 
-          <div className="h-40">
+          {/* IMPORTANT: fixed height for chart */}
+          <div className="h-56 w-full">
             <MoodChart refreshKey={refreshKey} />
           </div>
         </div>

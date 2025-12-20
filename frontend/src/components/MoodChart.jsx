@@ -20,7 +20,10 @@ ChartJS.register(
   Filler
 );
 
-// Map emotions to numeric levels (for chart)
+// 🔑 Backend base URL from Netlify env
+const API_BASE = import.meta.env.VITE_API_BASE;
+
+// Map emotions to numeric levels
 const emotionMap = {
   sad: 1,
   stress: 2,
@@ -33,34 +36,54 @@ const emotionMap = {
 function MoodChart({ refreshKey }) {
   const [history, setHistory] = useState([]);
 
-  // Fetch mood history whenever refreshKey changes
+  // Fetch mood history
   useEffect(() => {
+    if (!API_BASE) return;
+
     axios
-      .get("http://127.0.0.1:8000/history")
-      .then((res) => setHistory(res.data))
-      .catch(() => {});
+      .get(`${API_BASE}/history`)
+      .then((res) => {
+        setHistory(res.data || []);
+      })
+      .catch(() => {
+        setHistory([]);
+      });
   }, [refreshKey]);
 
-  const data = {
-    labels: history.map((_, index) => `Entry ${index + 1}`),
-    datasets: [
-      {
-        label: "Mood level",
-        data: history.map(
-          (item) => emotionMap[item.emotion] || 3
-        ),
-        fill: true,
-        backgroundColor: "rgba(74,166,163,0.15)", // soft teal
-        borderColor: "#4AA6A3",
-        tension: 0.4,
-        pointRadius: 3,
-      },
-    ],
-  };
+  // 🔴 If no data yet, show placeholder chart
+  const chartData =
+    history.length === 0
+      ? {
+          labels: ["No data"],
+          datasets: [
+            {
+              data: [3],
+              fill: true,
+              backgroundColor: "rgba(74,166,163,0.1)",
+              borderColor: "#4AA6A3",
+            },
+          ],
+        }
+      : {
+          labels: history.map((_, i) => `Entry ${i + 1}`),
+          datasets: [
+            {
+              label: "Mood level",
+              data: history.map(
+                (item) => emotionMap[item.emotion] || 3
+              ),
+              fill: true,
+              backgroundColor: "rgba(74,166,163,0.15)",
+              borderColor: "#4AA6A3",
+              tension: 0.4,
+              pointRadius: 4,
+            },
+          ],
+        };
 
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // important for fixed height
+    maintainAspectRatio: false, // 🔑 REQUIRED
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -85,7 +108,7 @@ function MoodChart({ refreshKey }) {
     },
   };
 
-  return <Line data={data} options={options} />;
+  return <Line data={chartData} options={options} />;
 }
 
 export default MoodChart;
